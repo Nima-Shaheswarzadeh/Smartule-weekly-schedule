@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Weekly Schedule — Nima</title>
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --surface: rgba(255,255,255,0.08);
+      --text: #e8ecf1;
+      --muted: #a9b2c0;
+      --primary: #6ef3ff;
+      --accent: #ff6bcb;
+      --success: #7cf48f;
+      --border: rgba(255,255,255,0.15);
+      --shadow-neon: 0 0 12px rgba(110,243,255,0.35), 0 0 24px rgba(255,107,203,0.25);
+      --radius: 16px;
+      --blur: 18px;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Vazirmatn", "IRANSans", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 80% 10%, rgba(255,107,203,0.15), transparent 50%),
+        radial-gradient(900px 500px at 20% 90%, rgba(110,243,255,0.18), transparent 50%),
+        linear-gradient(135deg, var(--bg), #0d1220 60%, var(--bg));
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .animated-grid {
+      position: fixed; inset: 0; pointer-events: none; opacity: 0.08;
+      background-image:
+        linear-gradient(0deg, rgba(255,255,255,0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: drift 16s linear infinite;
+    }
+    @keyframes drift { 0% { transform: translateY(0);} 100% { transform: translateY(-40px);} }
+
+    .container { max-width: 1100px; margin: 40px auto; padding: 0 20px 60px; }
+
+    .header {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 18px 20px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); backdrop-filter: blur(var(--blur)); box-shadow: var(--shadow-neon);
+    }
+    .title { display: flex; align-items: center; gap: 12px; }
+    .title h1 { font-size: 1.4rem; margin: 0; letter-spacing: 0.2px; }
+    .badge {
+      padding: 6px 10px; border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      color: white; font-weight: 600; font-size: 0.85rem;
+      box-shadow: 0 0 12px rgba(255,107,203,0.35);
+    }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border); cursor: pointer; user-select: none;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+    .chip:hover { transform: translateY(-1px); box-shadow: var(--shadow-neon); }
+    .chip input { accent-color: var(--accent); }
+
+    /* Tabs */
+    .tabs {
+      margin-top: 18px;
+      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px;
+    }
+    .tab {
+      flex: none;
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 12px 12px 0 0;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border); border-bottom: none;
+      cursor: pointer; user-select: none;
+      transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .tab:hover { transform: translateY(-1px); box-shadow: var(--shadow-neon); }
+    .tab.active {
+      background: linear-gradient(90deg, rgba(110,243,255,0.18), rgba(255,107,203,0.18));
+      box-shadow: var(--shadow-neon);
+    }
+    .tab .dot {
+      width: 8px; height: 8px; border-radius: 999px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      box-shadow: 0 0 8px rgba(255,107,203,0.4);
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      background: var(--surface);
+      backdrop-filter: blur(var(--blur));
+      box-shadow: var(--shadow-neon);
+      padding: 16px;
+    }
+
+    /* Items */
+    .item {
+      display: flex; align-items: center; gap: 12px; justify-content: space-between;
+      padding: 12px 14px; margin-bottom: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: box-shadow 0.2s ease, transform 0.12s ease, background 0.2s ease;
+    }
+    .item:hover { transform: translateY(-1px); box-shadow: inset 0 0 0 1px rgba(110,243,255,0.35), var(--shadow-neon); }
+    .item.done {
+      outline: 2px solid rgba(124,244,143,0.6);
+      background: linear-gradient(180deg, rgba(124,244,143,0.18), rgba(255,255,255,0.03));
+    }
+
+    .time-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 10px; border-radius: 999px; font-weight: 700; color: var(--text);
+      background: rgba(110,243,255,0.12); border: 1px solid rgba(110,243,255,0.35);
+      box-shadow: 0 0 10px rgba(110,243,255,0.25);
+      white-space: nowrap;
+    }
+    .task { flex: 1; min-width: 0; font-weight: 600; }
+    .checkbox { display: none; margin-inline-start: auto; }
+    .checkbox.visible { display: inline-block; }
+    .checkbox input { width: 20px; height: 20px; accent-color: var(--success); }
+
+    .progressbar {
+      width: 100%; height: 10px; background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border); border-radius: 999px; overflow: hidden; margin-top: 12px;
+    }
+    .progressbar > div {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      box-shadow: var(--shadow-neon); transition: width 0.35s ease;
+    }
+    .stats { display: flex; gap: 12px; font-size: 0.9rem; color: var(--muted); margin-top: 6px; flex-wrap: wrap; }
+
+    .footer { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; color: var(--muted); }
+    .btn {
+      padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06); color: var(--text); cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-neon); }
+
+    @media (max-width: 720px) {
+      .title h1 { font-size: 1.2rem; }
+      .item { flex-wrap: wrap; }
+      .checkbox { order: 3; }
+    }
+  </style>
+</head>
+<body>
+  <div class="animated-grid"></div>
+  <div class="container" id="app">
+    <div class="header">
+      <div class="title">
+        <span class="badge">نیمولی ❤️‍🔥</span>
+        <h1 aria-label="برنامه هفتگی">Smart Weekly Schedule</h1>
+      </div>
+      <div class="controls">
+        <label class="chip">
+          <input type="checkbox" id="toggleCheckboxes" checked />
+          <span>نمایش تیک‌ها</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+
+    <div class="panel">
+      <div class="progressbar" aria-label="پیشرفت هفته">
+        <div id="progressFill"></div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div id="dayContent" aria-live="polite"></div>
+      <div class="footer">
+        <button class="btn" id="saveBtn">ذخیره JSON</button>
+        <button class="btn" id="resetBtn">بازنشانی</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Days
+    const days = ["شنبه","یکشنبه","دوشنبه","سه‌شنبه","چهارشنبه","پنج‌شنبه","جمعه"];
+
+    // Schedule (جمعه به‌روزرسانی شده)
+    const schedule = {
+      "شنبه": [
+        ["15:00 - 15:30","ناهار + استراحت"],
+        ["15:30 - 16:00","مرور درسی"],
+        ["16:00 - 18:00","دیدن ویدیو یونیتی + جزوه‌نویسی"],
+        ["18:00 - 18:30","استراحت"],
+        ["18:30 - 19:30","مشق و درس"],
+        ["19:30 - 21:30","مرور جزوه‌های یونیتی"],
+        ["21:30 - 22:00","جمع‌بندی روز و آماده خواب"],
+        ["22:00","خواب"]
+      ],
+      "یکشنبه": [
+        ["15:00 - 15:30","ناهار + استراحت"],
+        ["15:30 - 16:00","مرور درسی"],
+        ["16:00 - 18:00","دیدن ویدیو یونیتی + جزوه‌نویسی"],
+        ["18:00 - 18:30","استراحت"],
+        ["18:30 - 19:30","مشق و مرور"],
+        ["19:30 - 21:30","مرور جزوه‌های یونیتی"],
+        ["21:30 - 22:00","جمع‌بندی روز"],
+        ["22:00","خواب"]
+      ],
+      "دوشنبه": [
+        ["15:00 - 15:30","ناهار + استراحت"],
+        ["15:30 - 16:00","مرور درسی"],
+        ["16:00 - 18:00","دیدن ویدیو یونیتی + جزوه‌نویسی"],
+        ["18:00 - 18:30","استراحت"],
+        ["18:30 - 19:30","مشق + آماده شدن برای زبان"],
+        ["19:30 - 21:30","کلاس زبان"],
+        ["21:30 - 22:00","استراحت بعد زبان"],
+        ["22:00","خواب"]
+      ],
+      "سه‌شنبه": [
+        ["15:00 - 15:30","ناهار + استراحت"],
+        ["15:30 - 16:00","مرور درسی"],
+        ["16:00 - 18:00","دیدن ویدیو یونیتی + جزوه‌نویسی"],
+        ["18:00 - 18:30","استراحت"],
+        ["18:30 - 19:30","مشق و مرور"],
+        ["19:30 - 21:30","مرور جزوه‌های یونیتی"],
+        ["21:30 - 22:00","جمع‌بندی روز"],
+        ["22:00","خواب"]
+      ],
+      "چهارشنبه": [
+        ["15:00 - 15:30","ناهار + استراحت"],
+        ["15:30 - 16:00","مرور درسی"],
+        ["16:00 - 18:00","دیدن ویدیو یونیتی + جزوه‌نویسی"],
+        ["18:00 - 18:30","استراحت"],
+        ["18:30 - 19:30","مشق"],
+        ["19:30 - 21:30","مرور جزوه‌های یونیتی"],
+        ["21:30 - 22:00","جمع‌بندی روز"],
+        ["22:00","خواب"]
+      ],
+      "پنج‌شنبه": [
+        ["15:00 - 15:30","ناهار + استراحت"],
+        ["15:30 - 16:00","مرور درسی"],
+        ["16:00 - 18:00","دیدن ویدیو یونیتی + جزوه‌نویسی"],
+        ["18:00 - 18:30","استراحت"],
+        ["18:30 - 19:30","مشق + آماده شدن برای زبان"],
+        ["19:30 - 21:30","کلاس زبان"],
+        ["21:30 - 22:00","استراحت بعد زبان"],
+        ["22:00","خواب"]
+      ],
+      "جمعه": [
+        ["15:00 - 15:30","صبحانه / استراحت"],
+        ["15:30 - 16:00","کارهای شخصی"],
+        ["16:00 - 18:00","تمرین و مرور مطالب یونیتی"],
+        ["18:00 - 19:00","دوچرخه‌سواری (۵ کیلومتر یا ۳۰ دقیقه)"],
+        ["19:00 - 19:30","استراحت"],
+        ["19:30 - 21:30","کارهای هنری / تفریحی یا فیلم / استراحت"],
+        ["21:30 - 22:00","مرور و برنامه‌ریزی فردا"],
+        ["22:00","خواب"]
+      ]
+    };
+
+    const tabsEl = document.getElementById('tabs');
+    const contentEl = document.getElementById('dayContent');
+    const progressFill = document.getElementById('progressFill');
+    const statsEl = document.getElementById('stats');
+    const toggleCheckboxes = document.getElementById('toggleCheckboxes');
+    const saveBtn = document.getElementById('saveBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // State
+    let activeDay = localStorage.getItem('schedule.activeDay') || days[0];
+    let showCheckboxes = (localStorage.getItem('schedule.checks') ?? 'true') === 'true';
+    let state = JSON.parse(localStorage.getItem('schedule.state') || '{}'); // keys: day|index
+
+    // WebAudio tick
+    let audioCtx;
+    function ensureAudio(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }
+    function playTick(ok=true){
+      ensureAudio();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type="sine"; o.frequency.value=ok?880:520;
+      g.gain.setValueAtTime(0.001,audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.15,audioCtx.currentTime+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.18);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime+0.2);
+    }
+
+    // Helpers
+    function keyFor(day, idx){ return `${day}|${idx}`; }
+
+    function totalItems(){
+      return days.reduce((sum, d)=> sum + (schedule[d]?.length || 0), 0);
+    }
+
+    function completedItems(){
+      return Object.values(state).filter(Boolean).length;
+    }
+
+    function updateProgress(){
+      const total = totalItems();
+      const completed = completedItems();
+      const pct = total ? Math.round(completed/total*100) : 0;
+
+      const dayTotal = (schedule[activeDay]||[]).length;
+      const dayCompleted = (schedule[activeDay]||[]).reduce((acc,_,i)=> acc + (state[keyFor(activeDay,i)]?1:0), 0);
+      const dayPct = dayTotal ? Math.round(dayCompleted/dayTotal*100) : 0;
+
+      progressFill.style.width = pct + '%';
+      statsEl.textContent = `پیشرفت هفته: ${pct}% • تکمیل شده: ${completed}/${total} • امروز (${activeDay}): ${dayPct}%`;
+    }
+
+    function renderTabs(){
+      tabsEl.innerHTML = '';
+      days.forEach(day=>{
+        const tab = document.createElement('div');
+        tab.className = 'tab' + (day===activeDay?' active':'');
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        const label = document.createElement('span');
+        label.textContent = day;
+        tab.appendChild(dot);
+        tab.appendChild(label);
+        tab.addEventListener('click', ()=>{
+          activeDay = day;
+          localStorage.setItem('schedule.activeDay', activeDay);
+          renderTabs();
+          renderDay();
+          updateProgress();
+        });
+        tabsEl.appendChild(tab);
+      });
+    }
+
+    function renderDay(){
+      contentEl.innerHTML = '';
+      const items = schedule[activeDay] || [];
+      items.forEach((pair, idx)=>{
+        const [time, task] = pair;
+        const k = keyFor(activeDay, idx);
+
+        const item = document.createElement('div');
+        item.className = 'item' + (state[k] ? ' done' : '');
+
+        const left = document.createElement('div');
+        left.style.display = 'flex';
+        left.style.alignItems = 'center';
+        left.style.gap = '10px';
+
+        const timeEl = document.createElement('span');
+        timeEl.className = 'time-pill';
+        timeEl.textContent = time;
+
+        const taskEl = document.createElement('div');
+        taskEl.className = 'task';
+        taskEl.textContent = task;
+
+        left.appendChild(timeEl);
+        left.appendChild(taskEl);
+
+        const checkbox = document.createElement('label');
+        checkbox.className = 'checkbox' + (showCheckboxes ? ' visible' : '');
+        checkbox.setAttribute('aria-label','تکمیل');
+
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = !!state[k];
+        input.addEventListener('change', ()=>{
+          state[k] = input.checked;
+          localStorage.setItem('schedule.state', JSON.stringify(state));
+          item.classList.toggle('done', input.checked);
+          playTick(input.checked);
+          updateProgress();
+        });
+
+        checkbox.appendChild(input);
+
+        item.appendChild(left);
+        item.appendChild(checkbox);
+
+        contentEl.appendChild(item);
+      });
+    }
+
+    function setCheckboxVisibility(visible){
+      showCheckboxes = visible;
+      toggleCheckboxes.checked = visible;
+      localStorage.setItem('schedule.checks', visible ? 'true' : 'false');
+      document.querySelectorAll('.checkbox').forEach(el=> el.classList.toggle('visible', showCheckboxes));
+    }
+
+    // Init
+    renderTabs();
+    renderDay();
+    setCheckboxVisibility(showCheckboxes);
+    updateProgress();
+
+    // Bindings
+    toggleCheckboxes.addEventListener('change', ()=> setCheckboxVisibility(toggleCheckboxes.checked));
+    saveBtn.addEventListener('click', ()=>{
+      const payload = { activeDay, showCheckboxes, state };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'nima_schedule_state.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+    resetBtn.addEventListener('click', ()=>{
+      if (!confirm('همه تیک‌ها پاک شوند؟')) return;
+      state = {};
+      localStorage.setItem('schedule.state', JSON.stringify(state));
+      renderDay();
+      updateProgress();
+    });
+
+    // Unlock audio on first interaction
+    window.addEventListener('pointerdown', ensureAudio, { once: true });
+  </script>
+</body>
+</html>
