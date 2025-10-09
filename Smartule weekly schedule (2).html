@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Weekly Schedule — برنامه هفتگی هوشمند</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#5D5CDE',
+            'primary-dark': '#4F46E5',
+            'secondary': '#06B6D4',
+            'accent': '#F97316',
+            'success': '#10B981',
+            'warning': '#F59E0B',
+            'danger': '#EF4444',
+          },
+          fontFamily: {
+            'persian': ['Vazirmatn', 'IRANSans', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-out',
+            'slide-up': 'slideUp 0.3s ease-out',
+            'slide-down': 'slideDown 0.3s ease-out',
+            'scale-in': 'scaleIn 0.2s ease-out',
+            'float': 'float 12s ease-in-out infinite',
+            'pulse-icon': 'pulseIcon 4s ease-in-out infinite',
+            'rotate-colors': 'rotateColors 10s ease-in-out infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0px, 0px) scale(1); }
+      25% { transform: translate(15px, -20px) scale(1.1); }
+      50% { transform: translate(-10px, 10px) scale(0.9); }
+      75% { transform: translate(10px, 20px) scale(1.05); }
+    }
+    @keyframes rotateColors {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    @keyframes pulseIcon {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .glass {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dark .glass {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .floating-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .floating-shape {
+      position: absolute;
+      border-radius: 50%;
+      background: linear-gradient(45deg, rgba(93, 92, 222, 0.1), rgba(6, 182, 212, 0.1));
+      animation: float 12s ease-in-out infinite;
+    }
+
+    .drag-placeholder {
+      border: 2px dashed rgba(79,70,229,0.4);
+      padding: 1rem;
+      border-radius: 0.75rem;
+      background: rgba(79,70,229,0.03);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 transition-all duration-500 font-persian">
+
+  <div class="floating-bg">
+    <div class="floating-shape w-40 h-40 top-[-20px] left-[-30px]" style="animation-duration: 15s;"></div>
+    <div class="floating-shape w-32 h-32 top-1/3 right-[-40px]" style="animation-duration: 12s; animation-delay: 2s;"></div>
+    <div class="floating-shape w-48 h-48 bottom-[-50px] left-1/4" style="animation-duration: 18s; animation-delay: 4s;"></div>
+    <div class="floating-shape w-24 h-24 bottom-1/4 right-1/3" style="animation-duration: 10s; animation-delay: 6s;"></div>
+    <div class="floating-shape w-36 h-36 top-1/2 left-[calc(50%-18rem)]" style="animation-duration: 14s; animation-delay: 8s;"></div>
+  </div>
+
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+
+    <div class="glass rounded-2xl p-6 mb-8 animate-slide-down">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-gradient-to-r from-primary via-secondary to-accent rounded-xl flex items-center justify-center animate-pulse-icon" style="background-size: 200% 200%; animation-name: pulseIcon, rotateColors;">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-2xl lg:text-3xl font-bold text-gray-800 dark:text-white">برنامه هفتگی هوشمند</h1>
+              <p class="text-gray-600 dark:text-gray-300 text-sm">مدیریت برنامه روزانه و هفتگی</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="text-center p-3 rounded-xl glass animate-scale-in">
+             <div id="currentTime" class="text-lg font-semibold text-gray-700 dark:text-gray-300">--:--:--</div>
+             <div id="currentDate" class="text-xs text-gray-600 dark:text-gray-400">--</div>
+          </div>
+            
+          <button id="themeToggle" class="p-3 rounded-xl glass hover:bg-white/20 dark:hover:bg-black/20 transition-all duration-300 animate-scale-in">
+            <svg id="sunIcon" class="w-5 h-5 text-gray-700 dark:text-gray-300 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <svg id="moonIcon" class="w-5 h-5 text-gray-700 dark:text-gray-300 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+          </button>
+
+          <label class="flex items-center gap-2 p-3 rounded-xl glass hover:bg-white/20 dark:hover:bg-black/20 transition-all cursor-pointer animate-scale-in">
+            <input type="checkbox" id="toggleCheckboxes" class="w-4 h-4 text-primary rounded focus:ring-primary focus:ring-2" checked />
+            <span class="text-sm text-gray-700 dark:text-gray-300">نمایش تیک‌ها</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass rounded-2xl p-6 mb-8 animate-slide-up">
+      <div class="mb-2">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-lg font-semibold text-gray-800 dark:text-white">پیشرفت هفته</span>
+          <span id="progressText" class="text-sm text-gray-600 dark:text-gray-300">0%</span>
+        </div>
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+          <div id="progressFill" class="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 rounded-full" style="width: 0%"></div>
+        </div>
+      </div>
+      <div id="stats" class="text-sm text-gray-600 dark:text-gray-400 mt-2"></div>
+    </div>
+
+    <div class="mb-8">
+      <div id="tabs" class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"></div>
+    </div>
+
+    <div class="glass rounded-2xl p-6 animate-fade-in">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <h2 id="dayTitle" class="text-xl font-bold text-gray-800 dark:text-white"></h2>
+        <div class="flex gap-2">
+           <button id="addItemBtn" class="px-3 py-2 text-sm bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-all flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            افزودن آیتم
+           </button>
+           <button id="clearDayBtn" class="px-3 py-2 text-sm bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-all">
+            پاک کردن روز
+           </button>
+           <button id="exportBtn" class="px-3 py-2 text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-all">
+            دانلود JSON
+           </button>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <input id="searchInput" placeholder="جستجو در این روز: عنوان یا زمان..." class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white" />
+      </div>
+
+      <div id="dayContent" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <div id="addModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md animate-scale-in">
+        <div class="flex justify-between items-center mb-4">
+          <h3 id="modalTitle" class="text-lg font-bold text-gray-800 dark:text-white">افزودن آیتم جدید</h3>
+          <button id="closeAddModal" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">زمان</label>
+            <input type="text" id="timeInput" placeholder="مثال: 15:00 - 16:00" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">فعالیت</label>
+            <input type="text" id="taskInput" placeholder="توضیح فعالیت" class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white" />
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button id="saveItemBtn" class="flex-1 px-4 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-lg hover:from-primary-dark hover:to-primary transition-all">
+              ذخیره
+            </button>
+            <button id="cancelAddBtn" class="px-4 py-3 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-all">
+              لغو
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm animate-scale-in">
+        <div class="text-center">
+          <div class="w-12 h-12 mx-auto mb-4 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">تأیید حذف</h3>
+          <p id="confirmMessage" class="text-gray-600 dark:text-gray-300 mb-6"></p>
+          <div class="flex gap-3">
+            <button id="confirmYes" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+              تأیید
+            </button>
+            <button id="confirmNo" class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+              لغو
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // اطلاعات اولیه
+    const days = ["شنبه","یکشنبه","دوشنبه","سه‌شنبه","چهارشنبه","پنج‌شنبه","جمعه"];
+
+    // پیش‌فرض برنامه — خالی کردن همه روزها (طبق درخواست)
+    const defaultSchedule = {
+      "شنبه": [],
+      "یکشنبه": [],
+      "دوشنبه": [],
+      "سه‌شنبه": [],
+      "چهارشنبه": [],
+      "پنج‌شنبه": [],
+      "جمعه": []
+    };
+
+    // State management
+    let schedule = JSON.parse(localStorage.getItem('schedule.data')) || defaultSchedule;
+    let activeDay = localStorage.getItem('schedule.activeDay') || days[0];
+    let showCheckboxes = (localStorage.getItem('schedule.showCheckboxes') ?? 'true') === 'true';
+    let completedTasks = JSON.parse(localStorage.getItem('schedule.completed')) || {};
+    let editMode = false;
+    let editIndex = null;
+
+    // Elements
+    const elements = {
+      themeToggle: document.getElementById('themeToggle'),
+      toggleCheckboxes: document.getElementById('toggleCheckboxes'),
+      addItemBtn: document.getElementById('addItemBtn'),
+      tabs: document.getElementById('tabs'),
+      dayTitle: document.getElementById('dayTitle'),
+      dayContent: document.getElementById('dayContent'),
+      progressFill: document.getElementById('progressFill'),
+      progressText: document.getElementById('progressText'),
+      stats: document.getElementById('stats'),
+      clearDayBtn: document.getElementById('clearDayBtn'),
+      exportBtn: document.getElementById('exportBtn'),
+      searchInput: document.getElementById('searchInput'),
+      currentTime: document.getElementById('currentTime'),
+      currentDate: document.getElementById('currentDate'),
+
+      // Modals
+      addModal: document.getElementById('addModal'),
+      closeAddModal: document.getElementById('closeAddModal'),
+      timeInput: document.getElementById('timeInput'),
+      taskInput: document.getElementById('taskInput'),
+      saveItemBtn: document.getElementById('saveItemBtn'),
+      cancelAddBtn: document.getElementById('cancelAddBtn'),
+
+      confirmModal: document.getElementById('confirmModal'),
+      confirmMessage: document.getElementById('confirmMessage'),
+      confirmYes: document.getElementById('confirmYes'),
+      confirmNo: document.getElementById('confirmNo'),
+      modalTitle: document.getElementById('modalTitle')
+    };
+
+    // Initialize theme
+    function initTheme() {
+      const savedTheme = localStorage.getItem('schedule.theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+
+    // Theme toggle
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('schedule.theme', isDark ? 'dark' : 'light');
+    }
+
+    // Audio feedback
+    let audioContext;
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playSound(frequency = 800, duration = 150) {
+      if (!audioContext) return;
+
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.type = 'sine';
+
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration / 1000);
+
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + duration / 1000);
+    }
+
+    // Save data
+    function saveData() {
+      localStorage.setItem('schedule.data', JSON.stringify(schedule));
+      localStorage.setItem('schedule.activeDay', activeDay);
+      localStorage.setItem('schedule.showCheckboxes', showCheckboxes);
+      localStorage.setItem('schedule.completed', JSON.stringify(completedTasks));
+    }
+
+    // Get task key
+    function getTaskKey(day, index) {
+      return `${day}-${index}`;
+    }
+
+    // Update progress
+    function updateProgress() {
+      const totalTasks = Object.values(schedule).reduce((sum, dayTasks) => sum + dayTasks.length, 0);
+      const completedCount = Object.keys(completedTasks).length;
+      const percentage = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+
+      elements.progressFill.style.width = `${percentage}%`;
+      elements.progressText.textContent = `${percentage}%`;
+
+      const dayTasks = schedule[activeDay] || [];
+      const dayCompletedCount = dayTasks.filter((_, index) => 
+        completedTasks[getTaskKey(activeDay, index)]
+      ).length;
+      const dayPercentage = dayTasks.length > 0 ? Math.round((dayCompletedCount / dayTasks.length) * 100) : 0;
+
+      elements.stats.textContent = `کل: ${completedCount}/${totalTasks} تکمیل شده • امروز: ${dayCompletedCount}/${dayTasks.length} (${dayPercentage}%)`;
+    }
+
+    // Render tabs
+    function renderTabs() {
+      elements.tabs.innerHTML = '';
+
+      days.forEach(day => {
+        const tab = document.createElement('button');
+        tab.className = `flex-shrink-0 px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-2 ${
+          day === activeDay 
+            ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg transform scale-105' 
+            : 'bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-white/70 dark:hover:bg-gray-700/50'
+        }`;
+
+        const dayTasks = schedule[day] || [];
+        const dayCompletedCount = dayTasks.filter((_, index) => 
+          completedTasks[getTaskKey(day, index)]
+        ).length;
+
+        tab.innerHTML = `
+          <div class="w-2 h-2 rounded-full ${day === activeDay ? 'bg-white' : 'bg-primary'}"></div>
+          <span class="font-medium">${day}</span>
+          <span class="text-xs opacity-75">${dayCompletedCount}/${dayTasks.length}</span>
+        `;
+
+        tab.addEventListener('click', () => {
+          activeDay = day;
+          saveData();
+          renderTabs();
+          renderDay();
+          updateProgress();
+          playSound(900, 100);
+        });
+
+        elements.tabs.appendChild(tab);
+      });
+    }
+
+    // Render day content (with search filter)
+    function renderDay() {
+      elements.dayTitle.textContent = `برنامه ${activeDay}`;
+      elements.dayContent.innerHTML = '';
+
+      const dayTasks = schedule[activeDay] || [];
+      const query = (elements.searchInput.value || '').trim().toLowerCase();
+
+      const filtered = query
+        ? dayTasks.map((t, i) => ({t, i})).filter(({t}) => (t[0] + ' ' + t[1]).toLowerCase().includes(query))
+        : dayTasks.map((t, i) => ({t, i}));
+
+      if (filtered.length === 0) {
+        elements.dayContent.innerHTML = `
+          <div class="text-center py-12 text-gray-500 dark:text-gray-400">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <p>هیچ فعالیتی برای این روز تعریف نشده یا با عبارت جستجو مطابقت ندارد</p>
+            <p class="text-sm mt-2">با کلیک روی دکمه "افزودن آیتم" یک فعالیت اضافه کنید</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(({t: task, i: originalIndex}, displayIndex) => {
+        const [time, activity] = task;
+        const taskKey = getTaskKey(activeDay, originalIndex);
+        const isCompleted = completedTasks[taskKey];
+
+        const taskElement = document.createElement('div');
+        taskElement.className = `group p-4 rounded-xl border transition-all duration-300 hover:shadow-lg animate-slide-up ${
+          isCompleted 
+            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' 
+            : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary/50'
+        }`;
+        taskElement.style.animationDelay = `${displayIndex * 50}ms`;
+        // enable dragging only when not filtering
+        if (!query) {
+          taskElement.draggable = true;
+          taskElement.dataset.index = originalIndex;
+        }
+
+        taskElement.innerHTML = `
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="flex-shrink-0 px-3 py-1 bg-gradient-to-r from-primary/10 to-secondary/10 text-primary dark:text-secondary rounded-lg text-sm font-medium">
+                ${time}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-gray-800 dark:text-gray-200 font-medium ${isCompleted ? 'line-through opacity-70' : ''}">${activity}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              ${showCheckboxes ? `
+                <label class="flex items-center cursor-pointer">
+                  <input type="checkbox" ${isCompleted ? 'checked' : ''} 
+                         class="w-5 h-5 text-primary rounded focus:ring-primary focus:ring-2"
+                         onchange="toggleTask('${activeDay}', ${originalIndex})">
+                </label>
+              ` : ''}
+
+              <button onclick="startEditItem(${originalIndex})" 
+                      class="p-2 text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg transition-colors" title="ویرایش">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z"></path>
+                </svg>
+              </button>
+
+              <button onclick="deleteTask('${activeDay}', ${originalIndex})" 
+                      class="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors" title="حذف">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+
+        elements.dayContent.appendChild(taskElement);
+      });
+
+      // attach drag/drop handlers only when not filtering
+      if (!query) enableDragAndDrop();
+    }
+
+    // Toggle task completion
+    window.toggleTask = function(day, index) {
+      const taskKey = getTaskKey(day, index);
+      if (completedTasks[taskKey]) {
+        delete completedTasks[taskKey];
+        playSound(600, 100);
+      } else {
+        completedTasks[taskKey] = true;
+        playSound(1000, 150);
+      }
+      saveData();
+      renderDay();
+      updateProgress();
+    };
+
+    // Delete task
+    window.deleteTask = function(day, index) {
+      const task = schedule[day][index];
+      showConfirmDialog(
+        `آیا از حذف این فعالیت مطمئن هستید؟\n"${task[1]}"`,
+        () => {
+          schedule[day].splice(index, 1);
+
+          // rebuild completedTasks keys to shift indices correctly
+          const newCompleted = {};
+          Object.keys(completedTasks).forEach(key => {
+            const [keyDay, keyIndex] = key.split('-');
+            const keyIndexNum = parseInt(keyIndex, 10);
+            if (keyDay === day) {
+              if (keyIndexNum < index) {
+                newCompleted[`${keyDay}-${keyIndexNum}`] = true;
+              } else if (keyIndexNum > index) {
+                newCompleted[`${keyDay}-${keyIndexNum - 1}`] = true;
+              }
+            } else {
+              newCompleted[key] = true;
+            }
+          });
+          completedTasks = newCompleted;
+
+          saveData();
+          renderDay();
+          updateProgress();
+          playSound(500, 200);
+        }
+      );
+    };
+
+    // start edit
+    function startEditItem(index) {
+      editMode = true;
+      editIndex = index;
+      const item = schedule[activeDay][index];
+      elements.timeInput.value = item[0];
+      elements.taskInput.value = item[1];
+      elements.modalTitle.textContent = 'ویرایش آیتم';
+      elements.addModal.classList.remove('hidden');
+      elements.timeInput.focus();
+    }
+
+    // Show add modal
+    function showAddModal() {
+      editMode = false;
+      editIndex = null;
+      elements.modalTitle.textContent = 'افزودن آیتم جدید';
+      elements.timeInput.value = '';
+      elements.taskInput.value = '';
+      elements.addModal.classList.remove('hidden');
+      elements.timeInput.focus();
+    }
+
+    // Hide add modal
+    function hideAddModal() {
+      elements.addModal.classList.add('hidden');
+    }
+
+    // Add or save edited task
+    function addOrSaveTask() {
+      const time = elements.timeInput.value.trim();
+      const task = elements.taskInput.value.trim();
+
+      if (!time || !task) {
+        playSound(400, 300);
+        return;
+      }
+
+      if (!schedule[activeDay]) schedule[activeDay] = [];
+
+      if (editMode && editIndex !== null) {
+        schedule[activeDay][editIndex] = [time, task];
+        playSound(1000, 120);
+      } else {
+        schedule[activeDay].push([time, task]);
+        playSound(1200, 200);
+      }
+
+      saveData();
+      hideAddModal();
+      renderTabs();
+      renderDay();
+      updateProgress();
+    }
+
+    // Show confirm dialog
+    function showConfirmDialog(message, onConfirm) {
+      elements.confirmMessage.textContent = message;
+      elements.confirmModal.classList.remove('hidden');
+
+      const handleYes = () => {
+        elements.confirmModal.classList.add('hidden');
+        elements.confirmYes.removeEventListener('click', handleYes);
+        elements.confirmNo.removeEventListener('click', handleNo);
+        onConfirm();
+      };
+
+      const handleNo = () => {
+        elements.confirmModal.classList.add('hidden');
+        elements.confirmYes.removeEventListener('click', handleYes);
+        elements.confirmNo.removeEventListener('click', handleNo);
+      };
+
+      elements.confirmYes.addEventListener('click', handleYes);
+      elements.confirmNo.addEventListener('click', handleNo);
+    }
+
+    // Clear day
+    function clearDay() {
+      showConfirmDialog(
+        `آیا از پاک کردن همه فعالیت‌های روز ${activeDay} مطمئن هستید؟`,
+        () => {
+          schedule[activeDay] = [];
+
+          // Remove completed tasks for this day
+          Object.keys(completedTasks).forEach(key => {
+            if (key.startsWith(`${activeDay}-`)) {
+              delete completedTasks[key];
+            }
+          });
+
+          saveData();
+          renderDay();
+          updateProgress();
+          renderTabs();
+          playSound(500, 300);
+        }
+      );
+    }
+
+    // Export data
+    function exportData() {
+      const data = {
+        schedule,
+        activeDay,
+        showCheckboxes,
+        completedTasks,
+        exportDate: new Date().toISOString()
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `برنامه-هفتگی-${new Date().toLocaleDateString('fa-IR')}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      playSound(1000, 200);
+    }
+
+    // Drag & Drop for reordering (only active when not searching)
+    function enableDragAndDrop() {
+      const items = Array.from(elements.dayContent.querySelectorAll('.group'));
+      let dragged = null;
+      let placeholder = null;
+
+      items.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+          dragged = item;
+          e.dataTransfer.effectAllowed = 'move';
+          try { e.dataTransfer.setData('text/plain', 'drag'); } catch (err) {}
+          item.classList.add('opacity-60');
+          // create placeholder
+          placeholder = document.createElement('div');
+          placeholder.className = 'drag-placeholder';
+          placeholder.style.height = `${item.offsetHeight}px`;
+        });
+
+        item.addEventListener('dragend', () => {
+          if (dragged) dragged.classList.remove('opacity-60');
+          if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder);
+          dragged = null;
+          placeholder = null;
+          saveData();
+          renderDay();
+          updateProgress();
+        });
+
+        item.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          const target = e.currentTarget;
+          if (!placeholder) return;
+          const rect = target.getBoundingClientRect();
+          const next = (e.clientY - rect.top) > (rect.height / 2);
+          if (next) {
+            if (target.nextSibling !== placeholder) target.parentNode.insertBefore(placeholder, target.nextSibling);
+          } else {
+            if (target.previousSibling !== placeholder) target.parentNode.insertBefore(placeholder, target);
+          }
+        });
+
+        item.addEventListener('drop', (e) => {
+          e.preventDefault();
+          if (!dragged) return;
+          const fromIndex = parseInt(dragged.dataset.index, 10);
+          // determine new index by searching children order
+          const children = Array.from(elements.dayContent.children);
+          const newOrderIndices = children.map(ch => {
+            return ch.dataset.index !== undefined ? parseInt(ch.dataset.index, 10) : null;
+          }).filter(v => v !== null);
+          // find position of placeholder
+          const placeholderIndex = children.indexOf(placeholder);
+          // compute target position among real items
+          let toPos = 0;
+          for (let i = 0, count = 0; i < children.length; i++) {
+            if (children[i] === placeholder) { toPos = count; break; }
+            if (children[i].dataset.index !== undefined) count++;
+          }
+          // move item in schedule array
+          const item = schedule[activeDay].splice(fromIndex, 1)[0];
+          schedule[activeDay].splice(toPos, 0, item);
+
+          // rebuild completedTasks mapping for this day
+          const newCompleted = {};
+          Object.keys(completedTasks).forEach(key => {
+            const [keyDay] = key.split('-');
+            if (keyDay !== activeDay) {
+              newCompleted[key] = completedTasks[key];
+            }
+          });
+          schedule[activeDay].forEach((_, newIndex) => {
+              const oldIndex = newOrderIndices[newIndex];
+              const oldKey = getTaskKey(activeDay, oldIndex);
+              if (completedTasks[oldKey]) {
+                  newCompleted[getTaskKey(activeDay, newIndex)] = true;
+              }
+          });
+          completedTasks = newCompleted;
+        });
+      });
+    }
+
+    // Update time and date
+    function updateDateTime() {
+      const now = new Date();
+      elements.currentTime.textContent = now.toLocaleTimeString('fa-IR');
+      elements.currentDate.textContent = now.toLocaleDateString('fa-IR', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+
+    // Event Listeners
+    function setupEventListeners() {
+      elements.themeToggle.addEventListener('click', () => { toggleTheme(); playSound(700, 50); });
+      elements.addItemBtn.addEventListener('click', () => { showAddModal(); playSound(800, 50); });
+      elements.closeAddModal.addEventListener('click', hideAddModal);
+      elements.cancelAddBtn.addEventListener('click', hideAddModal);
+      elements.saveItemBtn.addEventListener('click', addOrSaveTask);
+      elements.clearDayBtn.addEventListener('click', clearDay);
+      elements.exportBtn.addEventListener('click', exportData);
+      elements.searchInput.addEventListener('input', renderDay);
+      elements.toggleCheckboxes.addEventListener('change', (e) => {
+        showCheckboxes = e.target.checked;
+        saveData();
+        renderDay();
+        playSound(800, 100);
+      });
+      document.addEventListener('click', initAudio, { once: true });
+    }
+
+    // Initial render
+    function init() {
+      initTheme();
+      renderTabs();
+      renderDay();
+      updateProgress();
+      setupEventListeners();
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+      elements.toggleCheckboxes.checked = showCheckboxes;
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
