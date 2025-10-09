@@ -53,3 +53,4 @@
 این پروژه تحت مجوز **MIT** منتشر شده و استفاده، ویرایش و توسعه آن آزاد است.
 
 -----
+![Smartule Weekly Schedule](https://raw.githubusercontent.com/Nima-Shaheswarzadeh/Smartule-weekly-schedule/main/Welcome-Page.jpeg)
