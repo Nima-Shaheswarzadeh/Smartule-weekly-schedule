@@ -5,7 +5,7 @@
 هر روز را جدا ببین، آیتم‌ها را تیک بزن و پیشرفتت را با حال‌وهوای نئونی دنبال کن.  
 
 😍 **برای تست و استفاده:**  
-[![Smartule Weekly Schedule](https://img.shields.io/badge/SMART%20HTML%20Viewer-View-87CEEB?style=for-the-badge&logoColor=gray)](https://nima-shaheswarzadeh.github.io/Smartule-weekly-schedule)
+[![Smartule Weekly Schedule](https://img.shields.io/badge/Smartule%20Weekly%20Schedule-Open-0ea5a4?style=for-the-badge&logo=google-calendar&logoColor=white)](https://nima-shaheswarzadeh.github.io/Smartule-weekly-schedule)
 
 ---
 
