@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smartule Weekly Schedule</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      overflow-x: hidden;
+      background: radial-gradient(circle at 20% 30%, #1e1f27, #0a0a0d 80%);
+    }
+
+    .tech-bg {
+      position: fixed; top:0; left:0;
+      width:100%; height:100%; z-index:-1;
+      overflow:hidden;
+      background: radial-gradient(circle at 50% 50%, #141621 0%, #0a0a0d 100%);
+    }
+    .circle {
+      position:absolute; border-radius:50%;
+      background: rgba(100, 80, 255, 0.15);
+      animation: move 20s infinite ease-in-out;
+      filter: blur(60px);
+    }
+    @keyframes move {
+      0%,100%{transform:translate(0,0) scale(1);}
+      50%{transform:translate(50px,-80px) scale(1.3);}
+    }
+
+    .container {
+      max-width: 850px; margin:60px auto;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(18px);
+      border-radius: 25px; padding: 50px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.3);
+      position:relative; animation:fadeIn 1.5s ease-out;
+    }
+    @keyframes fadeIn {
+      from {opacity:0; transform:translateY(30px);}
+      to {opacity:1; transform:translateY(0);}
+    }
+
+    .logo {
+      font-size:3rem; font-weight:bold; margin-bottom:10px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow:0 0 20px rgba(100,80,255,0.3);
+      animation: glow 3s infinite alternate ease-in-out;
+    }
+    @keyframes glow {
+      from { text-shadow:0 0 10px rgba(100,80,255,0.3);}
+      to { text-shadow:0 0 30px rgba(103,82,255,0.8);}
+    }
+
+    .subtitle {
+      font-size:1.2rem; opacity:0.85; margin-bottom:40px; color:#dcdcdc;
+    }
+
+    .feature-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+      gap:25px; margin:40px 0;
+    }
+
+    .feature-card {
+      background: rgba(120,90,255,0.12); padding:25px;
+      border-radius:20px; transition:0.4s ease;
+      border:1px solid rgba(120,90,255,0.08);
+      box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    }
+    .feature-card:hover {
+      transform:translateY(-7px) scale(1.03);
+      box-shadow:0 8px 25px rgba(120,90,255,0.2);
+      background: rgba(120,90,255,0.18);
+    }
+
+    .feature-icon {
+      font-size:2.2rem; margin-bottom:10px; animation:float 3s infinite ease-in-out;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+
+    .feature-title {
+      font-weight:bold; font-size:1.1rem; margin-bottom:5px;
+      color:#a0a0ff;
+    }
+
+    .cta-button {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: #fff; padding:15px 35px; border:none; border-radius:50px;
+      font-size:1.1rem; font-weight:bold; cursor:pointer; transition:all 0.4s ease;
+      margin:20px 10px; text-decoration:none; display:inline-block;
+      box-shadow:0 0 25px rgba(120,90,255,0.4);
+    }
+    .cta-button:hover {
+      transform:scale(1.07);
+      box-shadow:0 0 40px rgba(120,90,255,0.8);
+    }
+
+    .credits { margin-top:50px; opacity:0.8; font-size:0.9rem; color:#b0b0b0; }
+
+    @media (max-width:600px){
+      .logo{font-size:2.3rem;}
+      .container{padding:25px;}
+      .feature-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tech-bg">
+    <div class="circle" style="width:250px;height:250px;top:20%;left:10%;animation-delay:0s;"></div>
+    <div class="circle" style="width:400px;height:400px;top:50%;left:70%;animation-delay:3s;"></div>
+    <div class="circle" style="width:300px;height:300px;top:80%;left:20%;animation-delay:6s;"></div>
+  </div>
+
+  <div class="container">
+    <div class="logo">🌐 Smartule Weekly Schedule</div>
+    <div class="subtitle">مدیریت برنامه هفتگی هوشمند با رابط کاربری مدرن، واکنش‌گرا و انیمیشن‌های جذاب ✨</div>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <div class="feature-title">مدیریت روزانه</div>
+        <div>افزودن، ویرایش، حذف و تکمیل فعالیت‌ها برای هر روز هفته</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">کشیدن و رها کردن</div>
+        <div>جابجایی ترتیب فعالیت‌ها با Drag & Drop ساده</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💾</div>
+        <div class="feature-title">ذخیره خودکار</div>
+        <div>تمام برنامه‌ها در LocalStorage مرورگر ذخیره می‌شوند</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌓</div>
+        <div class="feature-title">حالت تاریک و روشن</div>
+        <div>استفاده راحت در روز و شب با تم زیبا</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">نوار پیشرفت دوگانه</div>
+        <div>درصد پیشرفت روز و هفته را به صورت گرافیکی دنبال کنید</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <div class="feature-title">جستجوی سریع</div>
+        <div>فیلتر سریع فعالیت‌ها بر اساس عنوان یا زمان</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⏰</div>
+        <div class="feature-title">ورودی زمان تفکیک‌شده</div>
+        <div>فیلدهای جداگانه برای ساعت شروع و پایان</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <div class="feature-title">تیک‌های اختیاری</div>
+        <div>نمایش یا مخفی‌سازی چک‌باکس‌ها با سوییچ ساده</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📥</div>
+        <div class="feature-title">خروجی JSON</div>
+        <div>دانلود کل برنامه هفتگی به صورت فایل JSON</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔊</div>
+        <div class="feature-title">بازخورد صوتی</div>
+        <div>صداهای ظریف هنگام تعامل با برنامه</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <div class="feature-title">طراحی واکنش‌گرا</div>
+        <div>نمایش بی‌نقص در دسکتاپ، تبلت و موبایل</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <div class="feature-title">پشتیبانی کامل</div>
+        <div>سازگاری کامل با مرورگرها و دستگاه‌های مختلف</div>
+      </div>
+    </div>
+    
+    <a href="https://nima-shaheswarzadeh.github.io/Smartule-weekly-schedule" class="cta-button" target="_blank">
+      🚀 تست و استفاده
+    </a>
+    <a href="https://github.com/Nima-Shaheswarzadeh/Smartule-weekly-schedule" class="cta-button" target="_blank">
+      📂 مشاهده کد منبع
+    </a>
+    
+    <div class="credits">
+      <p>© 2025 ساخته شده با 💜 توسط <strong>Nima Shaheswarzadeh</strong></p>
+      <p>تکنولوژی‌ها: HTML5 • CSS3 • JavaScript • Web Audio API • Tailwind CSS</p>
+    </div>
+  </div>
+
+</body>
+</html>
